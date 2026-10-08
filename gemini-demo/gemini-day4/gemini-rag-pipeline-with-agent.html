@@ -1,0 +1,1799 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+<title>
+Gemini RAG Pipeline
+</title>
+
+
+<style>
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+
+  margin: 0;
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
+  background:
+    #07111f;
+
+  color:
+    #eef6ff;
+
+}
+
+
+.header {
+
+  padding:
+    30px 45px;
+
+  border-bottom:
+    1px solid #243850;
+
+}
+
+
+.header h1 {
+
+  margin: 0;
+
+  font-size: 34px;
+
+}
+
+
+.header p {
+
+  margin-top: 8px;
+
+  color:
+    #8da6c1;
+
+}
+
+
+.container {
+
+  display: grid;
+
+  grid-template-columns:
+    280px 1fr;
+
+  min-height:
+    calc(100vh - 120px);
+
+}
+
+
+/* ============================= */
+/* LEFT STEPS */
+/* ============================= */
+
+
+.sidebar {
+
+  padding: 30px 20px;
+
+  border-right:
+    1px solid #243850;
+
+}
+
+
+.step {
+
+  padding: 18px;
+
+  margin-bottom: 12px;
+
+  border:
+    1px solid #243850;
+
+  border-radius: 12px;
+
+  color:
+    #819ab4;
+
+}
+
+
+.step.active {
+
+  border-color:
+    #39a0ff;
+
+  background:
+    #0d2238;
+
+  color:
+    white;
+
+}
+
+
+.step.done {
+
+  border-color:
+    #38cc8c;
+
+}
+
+
+.step-number {
+
+  font-size: 12px;
+
+  color:
+    #4ed8c5;
+
+  margin-bottom: 6px;
+
+}
+
+
+.step-title {
+
+  font-size: 17px;
+
+  font-weight: bold;
+
+}
+
+
+/* ============================= */
+/* MAIN */
+/* ============================= */
+
+
+.main {
+
+  padding: 40px;
+
+}
+
+
+.panel {
+
+  max-width: 1000px;
+
+}
+
+
+.hidden {
+
+  display: none;
+
+}
+
+
+.tag {
+
+  display: inline-block;
+
+  color:
+    #4ed8c5;
+
+  font-weight: bold;
+
+  font-size: 12px;
+
+  letter-spacing:
+    2px;
+
+}
+
+
+h2 {
+
+  font-size: 32px;
+
+  margin:
+    10px 0;
+
+}
+
+
+.description {
+
+  color:
+    #8da6c1;
+
+  line-height:
+    1.6;
+
+  margin-bottom:
+    25px;
+
+}
+
+
+/* ============================= */
+/* PIPELINE */
+/* ============================= */
+
+
+.pipeline {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  margin:
+    25px 0;
+
+  flex-wrap: wrap;
+
+}
+
+
+.box {
+
+  background:
+    #10233a;
+
+  border:
+    1px solid #28527d;
+
+  border-radius:
+    9px;
+
+  padding:
+    12px 17px;
+
+}
+
+
+.arrow {
+
+  color:
+    #39a0ff;
+
+  font-size:
+    22px;
+
+}
+
+
+/* ============================= */
+/* INPUTS */
+/* ============================= */
+
+
+input {
+
+  width:
+    75%;
+
+  padding:
+    14px;
+
+  background:
+    #081522;
+
+  border:
+    1px solid #29445f;
+
+  color:
+    white;
+
+  border-radius:
+    8px;
+
+  font-size:
+    15px;
+
+}
+
+
+button {
+
+  padding:
+    13px 20px;
+
+  border: none;
+
+  border-radius:
+    8px;
+
+  cursor: pointer;
+
+  font-weight:
+    bold;
+
+}
+
+
+.run {
+
+  background:
+    #3ca2ff;
+
+  color:
+    #03101d;
+
+  margin-left:
+    6px;
+
+}
+
+
+.next {
+
+  margin-top:
+    20px;
+
+  background:
+    #194a70;
+
+  color:
+    white;
+
+}
+
+
+/* ============================= */
+/* TERMINAL OUTPUT */
+/* ============================= */
+
+
+.output {
+
+  background:
+    #020910;
+
+  border:
+    1px solid #203850;
+
+  border-radius:
+    10px;
+
+  margin-top:
+    22px;
+
+  padding:
+    20px;
+
+  min-height:
+    280px;
+
+  max-height:
+    480px;
+
+  overflow:
+    auto;
+
+  white-space:
+    pre-wrap;
+
+  font-family:
+    Monaco,
+    Consolas,
+    monospace;
+
+  font-size:
+    13px;
+
+  line-height:
+    1.6;
+
+  color:
+    #a8c7df;
+
+}
+
+
+.success {
+
+  color:
+    #68df9b;
+
+}
+
+
+.error {
+
+  color:
+    #ff7d7d;
+
+}
+
+
+/* ============================= */
+/* MCP RESULT */
+/* ============================= */
+
+
+.mcp-grid {
+
+  display:
+    grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap:
+    18px;
+
+}
+
+
+.answer {
+
+  background:
+    #0c1b2b;
+
+  border:
+    1px solid #284660;
+
+  padding:
+    20px;
+
+  border-radius:
+    10px;
+
+  line-height:
+    1.7;
+
+  min-height:
+    300px;
+
+  white-space:
+    pre-wrap;
+
+}
+
+
+@media (
+  max-width: 850px
+) {
+
+  .container {
+
+    grid-template-columns:
+      1fr;
+
+  }
+
+
+  .sidebar {
+
+    border-right:
+      none;
+
+  }
+
+
+  input {
+
+    width:
+      100%;
+
+    margin-bottom:
+      10px;
+
+  }
+
+
+  .mcp-grid {
+
+    grid-template-columns:
+      1fr;
+
+  }
+
+}
+
+
+.agent-note {
+  margin-top: 14px;
+  color: #8da6c1;
+  font-size: 13px;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="header">
+
+  <h1>
+    Gemini RAG Pipeline
+  </h1>
+
+  <p>
+    Documents → Retrieval → RAG → MCP → Agent
+  </p>
+
+</div>
+
+
+<div class="container">
+
+
+<!-- ==================================== -->
+<!-- LEFT NAVIGATION -->
+<!-- ==================================== -->
+
+
+<div class="sidebar">
+
+
+  <div
+    class="step active"
+    id="step1"
+  >
+
+    <div class="step-number">
+      STEP 1
+    </div>
+
+    <div class="step-title">
+      Index Documents
+    </div>
+
+  </div>
+
+
+  <div
+    class="step"
+    id="step2"
+  >
+
+    <div class="step-number">
+      STEP 2
+    </div>
+
+    <div class="step-title">
+      Semantic Search
+    </div>
+
+  </div>
+
+
+  <div
+    class="step"
+    id="step3"
+  >
+
+    <div class="step-number">
+      STEP 3
+    </div>
+
+    <div class="step-title">
+      RAG
+    </div>
+
+  </div>
+
+
+  <div
+    class="step"
+    id="step4"
+  >
+
+    <div class="step-number">
+      STEP 4
+    </div>
+
+    <div class="step-title">
+      MCP + RAG
+    </div>
+
+  </div>
+
+
+  <div
+    class="step"
+    id="step5"
+  >
+
+    <div class="step-number">
+      STEP 5
+    </div>
+
+    <div class="step-title">
+      Agent
+    </div>
+
+  </div>
+
+
+</div>
+
+
+<!-- ==================================== -->
+<!-- MAIN CONTENT -->
+<!-- ==================================== -->
+
+
+<div class="main">
+
+
+<!-- ==================================== -->
+<!-- STEP 1 -->
+<!-- ==================================== -->
+
+
+<div
+  class="panel"
+  id="panel1"
+>
+
+
+<span class="tag">
+STEP 1
+</span>
+
+
+<h2>
+Index Documents
+</h2>
+
+
+<p class="description">
+
+Convert the company documents into
+chunks and embeddings and store them
+inside knowledge.json.
+
+</p>
+
+
+<div class="pipeline">
+
+  <div class="box">
+    Documents
+  </div>
+
+  <div class="arrow">
+    →
+  </div>
+
+  <div class="box">
+    Chunks
+  </div>
+
+  <div class="arrow">
+    →
+  </div>
+
+  <div class="box">
+    Embeddings
+  </div>
+
+  <div class="arrow">
+    →
+  </div>
+
+  <div class="box">
+    knowledge.json
+  </div>
+
+</div>
+
+
+<button
+  class="run"
+  onclick="runIndex()"
+>
+
+Run Indexing
+
+</button>
+
+
+<div
+  class="output"
+  id="indexOutput"
+>
+
+Click "Run Indexing" to begin.
+
+</div>
+
+
+<button
+  class="next hidden"
+  id="next1"
+  onclick="showPanel(2)"
+>
+
+Next: Semantic Search →
+
+</button>
+
+
+</div>
+
+
+<!-- ==================================== -->
+<!-- STEP 2 -->
+<!-- ==================================== -->
+
+
+<div
+  class="panel hidden"
+  id="panel2"
+>
+
+
+<span class="tag">
+STEP 2
+</span>
+
+
+<h2>
+Semantic Search
+</h2>
+
+
+<p class="description">
+
+Convert the user's question into an
+embedding and find the most similar
+document chunks.
+
+</p>
+
+
+<div class="pipeline">
+
+  <div class="box">
+    Question
+  </div>
+
+  <div class="arrow">
+    →
+  </div>
+
+  <div class="box">
+    Embedding
+  </div>
+
+  <div class="arrow">
+    →
+  </div>
+
+  <div class="box">
+    Similarity
+  </div>
+
+  <div class="arrow">
+    →
+  </div>
+
+  <div class="box">
+    Top 3
+  </div>
+
+</div>
+
+
+<input
+  id="searchQuestion"
+  value="Can I carry unused vacation days into next year?"
+>
+
+
+<button
+  class="run"
+  onclick="runSearch()"
+>
+
+Search
+
+</button>
+
+
+<div
+  class="output"
+  id="searchOutput"
+>
+
+Waiting for semantic search.
+
+</div>
+
+
+<button
+  class="next hidden"
+  id="next2"
+  onclick="showPanel(3)"
+>
+
+Next: RAG →
+
+</button>
+
+
+</div>
+
+
+<!-- ==================================== -->
+<!-- STEP 3 -->
+<!-- ==================================== -->
+
+
+<div
+  class="panel hidden"
+  id="panel3"
+>
+
+
+<span class="tag">
+STEP 3
+</span>
+
+
+<h2>
+RAG
+</h2>
+
+
+<p class="description">
+
+Retrieve relevant chunks and give those
+chunks to Gemini as grounding context.
+
+</p>
+
+
+<div class="pipeline">
+
+  <div class="box">
+    Question
+  </div>
+
+  <div class="arrow">
+    →
+  </div>
+
+  <div class="box">
+    Retrieve
+  </div>
+
+  <div class="arrow">
+    →
+  </div>
+
+  <div class="box">
+    Context
+  </div>
+
+  <div class="arrow">
+    →
+  </div>
+
+  <div class="box">
+    Gemini
+  </div>
+
+  <div class="arrow">
+    →
+  </div>
+
+  <div class="box">
+    Answer
+  </div>
+
+</div>
+
+
+<input
+  id="ragQuestion"
+  value="Can I carry unused vacation days into next year?"
+>
+
+
+<button
+  class="run"
+  onclick="runRag()"
+>
+
+Run RAG
+
+</button>
+
+
+<div
+  class="output"
+  id="ragOutput"
+>
+
+Waiting for RAG execution.
+
+</div>
+
+
+<button
+  class="next hidden"
+  id="next3"
+  onclick="showPanel(4)"
+>
+
+Next: MCP + RAG →
+
+</button>
+
+
+</div>
+
+
+<!-- ==================================== -->
+<!-- STEP 4 -->
+<!-- ==================================== -->
+
+
+<div
+  class="panel hidden"
+  id="panel4"
+>
+
+
+<span class="tag">
+STEP 4
+</span>
+
+
+<h2>
+MCP + RAG
+</h2>
+
+
+<p class="description">
+
+The UI becomes an MCP client.
+It starts your existing MCP server,
+discovers the RAG tool, invokes it,
+retrieves company knowledge and gives
+that knowledge to Gemini.
+
+</p>
+
+
+<div class="pipeline">
+
+  <div class="box">
+    User
+  </div>
+
+  <div class="arrow">
+    →
+  </div>
+
+  <div class="box">
+    MCP Client
+  </div>
+
+  <div class="arrow">
+    →
+  </div>
+
+  <div class="box">
+    RAG Tool
+  </div>
+
+  <div class="arrow">
+    →
+  </div>
+
+  <div class="box">
+    Vector Search
+  </div>
+
+  <div class="arrow">
+    →
+  </div>
+
+  <div class="box">
+    Gemini
+  </div>
+
+</div>
+
+
+<input
+  id="mcpQuestion"
+  value="I have a 10-hour international flight. Can I book business class?"
+>
+
+
+<button
+  class="run"
+  onclick="runMcp()"
+>
+
+Run MCP + RAG
+
+</button>
+
+
+<div class="mcp-grid">
+
+
+<div>
+
+<h3>
+Execution Trace
+</h3>
+
+
+<div
+  class="output"
+  id="mcpTrace"
+>
+
+Waiting for MCP execution.
+
+</div>
+
+</div>
+
+
+<div>
+
+<h3>
+Final Answer
+</h3>
+
+
+<div
+  class="answer"
+  id="mcpAnswer"
+>
+
+The final grounded answer will appear here.
+
+</div>
+
+</div>
+
+
+</div>
+
+
+<button
+  class="next"
+  onclick="showPanel(5)"
+>
+
+Next: Agent →
+
+</button>
+
+
+</div>
+
+
+<!-- ==================================== -->
+<!-- STEP 5 -->
+<!-- ==================================== -->
+
+
+<div
+  class="panel hidden"
+  id="panel5"
+>
+
+
+<span class="tag">
+STEP 5
+</span>
+
+
+<h2>
+Agentic Workflow
+</h2>
+
+
+<p class="description">
+
+Give the agent a goal. Gemini decides what it needs to know,
+which MCP tools to call, and in what order.
+
+</p>
+
+
+<div class="pipeline">
+
+  <div class="box">
+    Goal
+  </div>
+
+  <div class="arrow">
+    →
+  </div>
+
+  <div class="box">
+    Plan
+  </div>
+
+  <div class="arrow">
+    →
+  </div>
+
+  <div class="box">
+    RAG
+  </div>
+
+  <div class="arrow">
+    →
+  </div>
+
+  <div class="box">
+    MCP Actions
+  </div>
+
+  <div class="arrow">
+    →
+  </div>
+
+  <div class="box">
+    Validate
+  </div>
+
+</div>
+
+
+<input
+  id="agentGoal"
+  value="Employee E103 cannot connect to corporate Wi-Fi, but Ethernet works. Handle this incident."
+>
+
+
+<button
+  class="run"
+  onclick="runAgent()"
+>
+
+Run Agent
+
+</button>
+
+
+<div class="mcp-grid">
+
+
+<div>
+
+<h3>
+Agent Trace
+</h3>
+
+
+<div
+  class="output"
+  id="agentTrace"
+>
+
+Waiting for the agent.
+
+</div>
+
+</div>
+
+
+<div>
+
+<h3>
+Final Result
+</h3>
+
+
+<div
+  class="answer"
+  id="agentAnswer"
+>
+
+The completed agent result will appear here.
+
+</div>
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+</div>
+
+
+<script>
+
+
+function showPanel(
+  number
+) {
+
+
+  for (
+    let i = 1;
+    i <= 5;
+    i++
+  ) {
+
+    document
+      .getElementById(
+        "panel" + i
+      )
+      .classList
+      .add(
+        "hidden"
+      );
+
+
+    document
+      .getElementById(
+        "step" + i
+      )
+      .classList
+      .remove(
+        "active"
+      );
+
+  }
+
+
+  document
+    .getElementById(
+      "panel" + number
+    )
+    .classList
+    .remove(
+      "hidden"
+    );
+
+
+  document
+    .getElementById(
+      "step" + number
+    )
+    .classList
+    .add(
+      "active"
+    );
+
+}
+
+
+
+async function postJSON(
+  url,
+  body = {}
+) {
+
+
+  const response =
+    await fetch(
+      url,
+      {
+
+        method:
+          "POST",
+
+        headers: {
+
+          "Content-Type":
+            "application/json"
+
+        },
+
+        body:
+          JSON.stringify(
+            body
+          )
+
+      }
+    );
+
+
+  const data =
+    await response.json();
+
+
+  if (
+    !response.ok
+    ||
+    !data.success
+  ) {
+
+    throw new Error(
+      data.error
+      ||
+      "Request failed"
+    );
+
+  }
+
+
+  return data;
+
+}
+
+
+
+async function runIndex() {
+
+
+  const output =
+    document.getElementById(
+      "indexOutput"
+    );
+
+
+  output.textContent =
+    "Indexing documents...\nCreating embeddings...";
+
+
+  try {
+
+
+    const data =
+      await postJSON(
+        "/api/index"
+      );
+
+
+    output.textContent =
+      data.output;
+
+
+    output.classList.add(
+      "success"
+    );
+
+
+    document
+      .getElementById(
+        "step1"
+      )
+      .classList
+      .add(
+        "done"
+      );
+
+
+    document
+      .getElementById(
+        "next1"
+      )
+      .classList
+      .remove(
+        "hidden"
+      );
+
+
+  }
+
+  catch (error) {
+
+
+    output.textContent =
+      error.message;
+
+
+    output.classList.add(
+      "error"
+    );
+
+
+  }
+
+}
+
+
+
+async function runSearch() {
+
+
+  const question =
+    document
+      .getElementById(
+        "searchQuestion"
+      )
+      .value;
+
+
+  const output =
+    document.getElementById(
+      "searchOutput"
+    );
+
+
+  output.textContent =
+    "Embedding question...\nRunning vector similarity search...";
+
+
+  try {
+
+
+    const data =
+      await postJSON(
+
+        "/api/search",
+
+        {
+          question
+        }
+
+      );
+
+
+    output.textContent =
+      data.output;
+
+
+    output.classList.add(
+      "success"
+    );
+
+
+    document
+      .getElementById(
+        "step2"
+      )
+      .classList
+      .add(
+        "done"
+      );
+
+
+    document
+      .getElementById(
+        "next2"
+      )
+      .classList
+      .remove(
+        "hidden"
+      );
+
+
+    document
+      .getElementById(
+        "ragQuestion"
+      )
+      .value =
+        question;
+
+
+  }
+
+  catch (error) {
+
+
+    output.textContent =
+      error.message;
+
+
+    output.classList.add(
+      "error"
+    );
+
+
+  }
+
+}
+
+
+
+async function runRag() {
+
+
+  const question =
+    document
+      .getElementById(
+        "ragQuestion"
+      )
+      .value;
+
+
+  const output =
+    document.getElementById(
+      "ragOutput"
+    );
+
+
+  output.textContent =
+    "Retrieving context...\nSending context to Gemini...";
+
+
+  try {
+
+
+    const data =
+      await postJSON(
+
+        "/api/rag",
+
+        {
+          question
+        }
+
+      );
+
+
+    output.textContent =
+      data.output;
+
+
+    output.classList.add(
+      "success"
+    );
+
+
+    document
+      .getElementById(
+        "step3"
+      )
+      .classList
+      .add(
+        "done"
+      );
+
+
+    document
+      .getElementById(
+        "next3"
+      )
+      .classList
+      .remove(
+        "hidden"
+      );
+
+
+    document
+      .getElementById(
+        "mcpQuestion"
+      )
+      .value =
+        question;
+
+
+  }
+
+  catch (error) {
+
+
+    output.textContent =
+      error.message;
+
+
+    output.classList.add(
+      "error"
+    );
+
+
+  }
+
+}
+
+
+
+async function runMcp() {
+
+
+  const question =
+    document
+      .getElementById(
+        "mcpQuestion"
+      )
+      .value;
+
+
+  const trace =
+    document.getElementById(
+      "mcpTrace"
+    );
+
+
+  const answer =
+    document.getElementById(
+      "mcpAnswer"
+    );
+
+
+  trace.textContent =
+    "Starting MCP client...\nConnecting to MCP server...";
+
+
+  answer.textContent =
+    "Waiting...";
+
+
+  try {
+
+
+    const data =
+      await postJSON(
+
+        "/api/mcp-rag",
+
+        {
+          question
+        }
+
+      );
+
+
+    trace.textContent =
+      data.trace;
+
+
+    trace.classList.add(
+      "success"
+    );
+
+
+    answer.textContent =
+      data.answer;
+
+
+    document
+      .getElementById(
+        "step4"
+      )
+      .classList
+      .add(
+        "done"
+      );
+
+
+  }
+
+  catch (error) {
+
+
+    trace.textContent =
+      error.message;
+
+
+    trace.classList.add(
+      "error"
+    );
+
+
+  }
+
+}
+
+
+async function runAgent() {
+
+
+  const goal =
+    document
+      .getElementById(
+        "agentGoal"
+      )
+      .value;
+
+
+  const trace =
+    document.getElementById(
+      "agentTrace"
+    );
+
+
+  const answer =
+    document.getElementById(
+      "agentAnswer"
+    );
+
+
+  trace.textContent =
+    "Agent starting...\nDiscovering MCP tools...\nPlanning next actions...";
+
+
+  answer.textContent =
+    "Waiting for agent completion...";
+
+
+  trace.classList.remove(
+    "success",
+    "error"
+  );
+
+
+  try {
+
+
+    const data =
+      await postJSON(
+
+        "/api/agent",
+
+        {
+          goal
+        }
+
+      );
+
+
+    trace.textContent =
+      data.trace
+        .map(
+          item =>
+            `[${item.stage}] ${item.message}`
+        )
+        .join(
+          "\n\n"
+        );
+
+
+    trace.classList.add(
+      "success"
+    );
+
+
+    answer.textContent =
+      data.answer;
+
+
+    document
+      .getElementById(
+        "step5"
+      )
+      .classList
+      .add(
+        "done"
+      );
+
+
+  }
+
+  catch (error) {
+
+
+    trace.textContent =
+      error.message;
+
+
+    trace.classList.add(
+      "error"
+    );
+
+
+    answer.textContent =
+      "Agent execution failed.";
+
+
+  }
+
+}
+
+
+</script>
+
+
+</body>
+
+</html>

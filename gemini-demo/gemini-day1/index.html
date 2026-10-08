@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expense Tracker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div class="container">
+
+    <h1>Expense Tracker</h1>
+
+    <div class="form category-form">
+      <input
+        id="newCategory"
+        type="text"
+        placeholder="New Category Name"
+        maxlength="15"
+      >
+      <button onclick="createCategory()">
+        Add Category
+      </button>
+    </div>
+
+    <div class="form">
+
+      <input
+        id="description"
+        type="text"
+        placeholder="Expense description"
+      >
+
+      <input
+        id="amount"
+        type="number"
+        placeholder="Amount"
+      >
+
+      <select id="category">
+        <option value="" disabled selected>Category</option>
+      </select>
+
+      <button onclick="addExpense()">
+        Add Expense
+      </button>
+
+    </div>
+
+    <h2>
+      Total: ₹<span id="total">0</span>
+    </h2>
+
+    <div class="filter-section">
+      <label for="categoryFilter">Filter by Category:</label>
+      <select id="categoryFilter" onchange="renderExpenses()">
+        <option value="All">All</option>
+      </select>
+    </div>
+
+    <ul id="expenseList"></ul>
+
+  </div>
+
+  <script src="app.js"></script>
+
+</body>
+</html>

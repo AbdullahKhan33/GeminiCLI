@@ -1,0 +1,13 @@
+IT SUPPORT POLICY
+
+P1 incidents represent complete business outages
+or critical security incidents.
+
+P2 incidents involve major service degradation
+affecting multiple users.
+
+P3 incidents normally affect an individual user
+where a workaround exists.
+
+P4 incidents include general requests and
+non-urgent issues.
